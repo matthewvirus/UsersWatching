@@ -1,0 +1,93 @@
+@page
+@model UsersModel
+
+@{
+    ViewData["Title"] = "All users";
+}
+
+<h1>@ViewData["Title"]</h1>
+<form method="post">
+    <div class="row">
+        <div class="d-flex justify-content-end">
+            <button class="btn" asp-page-handler="Block">
+                <img src="/Images/block.png" height="40px" width="40px" title="Block">
+            </button>
+            <button class="btn" asp-page-handler="Unblock">
+                <img src="/Images/unlock.png" height="40px" width="40px" title="Unblock">
+            </button>
+            <button class="btn" asp-page-handler="Delete">
+                <img src="/Images/delete.png" height="40px" width="40px" title="Delete">
+            </button>
+        </div>
+    </div>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">
+                @Html.CheckBox("IsChecked")
+            </th>
+            <th scope="col">@Html.DisplayNameFor(model => model.Users[0].Id)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.Users[0].Name)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.Users[0].Email)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.Users[0].RegistrationDate)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.Users[0].LastLoginDate)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.Users[0].Status)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model.Users)
+        {
+            <tr>
+                <td>
+                    @Html.CheckBox("IsChecked", false)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => user.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => user.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => user.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => user.RegistrationDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => user.LastLoginDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => user.Status)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script src="https://snipp.ru/cdn/jquery/2.1.1/jquery.min.js"></script>
+<script>
+(function($){
+	$.fn.checkboxTable = function() {
+	target = this;
+
+	$(target).on('click', 'thead :checkbox', function() {
+		var check = this;
+		$(this).parents('table').find('tbody :checkbox').each(function(){
+			if ($(check).is(':checked')) {
+				$(this).prop('checked', true);
+				$(this).parents('tr').addClass('selected');
+			} else {
+				$(this).prop('checked', false);
+				$(this).parents('tr').removeClass('selected');
+			}
+		});
+	});};
+})(jQuery);
+
+$('.table').checkboxTable();
+</script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
