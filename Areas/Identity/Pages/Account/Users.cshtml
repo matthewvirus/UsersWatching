@@ -4,90 +4,79 @@
 @{
     ViewData["Title"] = "All users";
 }
-
 <h1>@ViewData["Title"]</h1>
-<form method="post">
+<form asp-action="UsersForm" method="post">
     <div class="row">
         <div class="d-flex justify-content-end">
-            <button class="btn" asp-page-handler="Block">
-                <img src="/Images/block.png" height="40px" width="40px" title="Block">
+            <button type="submit" class="btn" asp-action="Block" value="Block">
+                <img src="/Images/block.png" width="40px" height="40px">
             </button>
-            <button class="btn" asp-page-handler="Unblock">
-                <img src="/Images/unlock.png" height="40px" width="40px" title="Unblock">
+            <button type="submit" class="btn" asp-action="Unblock" value="Unblock">
+                <img src="/Images/unlock.png" width="40px" height="40px">
             </button>
-            <button class="btn" asp-page-handler="Delete">
-                <img src="/Images/delete.png" height="40px" width="40px" title="Delete">
+            <button type="submit" class="btn" asp-action="Delete" value="Delete">
+                <img src="/Images/delete.png" width="40px" height="40px">
             </button>
         </div>
     </div>
-</form>
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">
-                @Html.CheckBox("IsChecked")
-            </th>
-            <th scope="col">@Html.DisplayNameFor(model => model.Users[0].Id)</th>
-            <th scope="col">@Html.DisplayNameFor(model => model.Users[0].Name)</th>
-            <th scope="col">@Html.DisplayNameFor(model => model.Users[0].Email)</th>
-            <th scope="col">@Html.DisplayNameFor(model => model.Users[0].RegistrationDate)</th>
-            <th scope="col">@Html.DisplayNameFor(model => model.Users[0].LastLoginDate)</th>
-            <th scope="col">@Html.DisplayNameFor(model => model.Users[0].Status)</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var user in Model.Users)
-        {
+    <table class="table">
+        <thead>
             <tr>
-                <td>
-                    @Html.CheckBox("IsChecked", false)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => user.Id)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => user.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => user.Email)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => user.RegistrationDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => user.LastLoginDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => user.Status)
-                </td>
+                <th scope="col">
+                    <input type="checkbox" onclick="CheckAll('chek', this)">
+                </th>
+                <th scope="col">@Html.DisplayNameFor(model => model.Users[0].Id)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.Users[0].Name)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.Users[0].Email)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.Users[0].RegistrationDate)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.Users[0].LastLoginDate)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.Users[0].Status)</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var user in Model.Users)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" value="@user.Id.ToString()" class="chek">
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => user.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => user.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => user.Email)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => user.RegistrationDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => user.LastLoginDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => user.Status)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</form>
 
-<script src="https://snipp.ru/cdn/jquery/2.1.1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 <script>
-(function($){
-	$.fn.checkboxTable = function() {
-	target = this;
-
-	$(target).on('click', 'thead :checkbox', function() {
-		var check = this;
-		$(this).parents('table').find('tbody :checkbox').each(function(){
-			if ($(check).is(':checked')) {
-				$(this).prop('checked', true);
-				$(this).parents('tr').addClass('selected');
-			} else {
-				$(this).prop('checked', false);
-				$(this).parents('tr').removeClass('selected');
-			}
-		});
-	});};
-})(jQuery);
-
-$('.table').checkboxTable();
+    function CheckAll(className, elem) {
+        var elements = document.getElementsByClassName(className);
+        var l = elements.length;
+        if (elem.checked) {
+            for (var i = 0; i < l; i++) {
+                elements[i].checked = true;
+            }
+        } else {
+            for (var i = 0; i < l; i++) {
+                elements[i].checked = false;
+            }
+        }
+    }
 </script>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}

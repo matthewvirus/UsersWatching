@@ -28,28 +28,110 @@ namespace UsersWebApp.Areas.Identity.Pages {
 
         public IList<User> Users = new List<User>();
 
-        public IList<User> CheckedUsers = new List<User>();
-
         public void OnGet()
         {
             GetAllUsers();
-            GetCheckedUsers();
         }
 
-        // public async Task<IActionResult> OnPostBlockAsync()
-        // {
-        // }
+        [HttpPost]
+        public async Task<IActionResult> UsersForm(string submitButton, string[] selectedUsers)
+        {
+            if (selectedUsers == null)
+                return RedirectToPage("Account/Users");
+            switch (submitButton)
+            {
+                case "Block":
+                    return await Block(selectedUsers);
+                case "Unlock":
+                    return await Unblock(selectedUsers);
+                case "Delete":
+                    return await Delete(selectedUsers);
+                default:
+                    break;
+            }
+            return RedirectToPage("Account/Users");
+        }
 
-        // public async Task<IActionResult> OnPostUnblockAsync()
-        // {
-        // }
-
-        public async Task<IActionResult> OnPostDeleteAsync()
+        [HttpPost]
+        public async Task<IActionResult> Block(string[] selectedUsers)
         {
             var currentUser = await userManager.GetUserAsync(HttpContext.User);
-            await signInManager.SignOutAsync();
-            await userManager.DeleteAsync(currentUser);
-            return RedirectToPage("/Account/Login");
+            if (selectedUsers != null)
+            {
+                foreach (var uid in selectedUsers)
+                {
+                    var user = await userManager.FindByIdAsync(uid);
+                    if (user != null)
+                    {
+                        user.Status = UserStatus.Blocked;
+                        await userManager.SetLockoutEnabledAsync(user, true);
+                        await userManager.UpdateAsync(user);
+                        if (user == currentUser) 
+                        {
+                            return RedirectToPage("/Account/Login");
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "User Not Found");
+                    }
+                }
+            }
+            return RedirectToPage("Account/Users");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Unblock(string[] selectedUsers)
+        {
+            var currentUser = await userManager.GetUserAsync(HttpContext.User);
+            if (selectedUsers != null)
+            {
+                foreach (var uid in selectedUsers)
+                {
+                    var user = await userManager.FindByIdAsync(uid);
+                    if (user != null)
+                    {
+                        user.Status = UserStatus.Unblocked;
+                        await userManager.SetLockoutEnabledAsync(user, false);
+                        await userManager.UpdateAsync(user);
+                        if (user == currentUser) 
+                        {
+                            return RedirectToPage("/Account/Login");
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "User Not Found");
+                    }
+                }
+            }
+            return RedirectToPage("Account/Users");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(string[] selectedUsers)
+        {
+            var currentUser = await userManager.GetUserAsync(HttpContext.User);
+            if (selectedUsers != null)
+            {
+                foreach (var uid in selectedUsers)
+                {
+                    var user = await userManager.FindByIdAsync(uid);
+                    if (user != null)
+                    {
+                        await userManager.DeleteAsync(user);
+                        if (currentUser == user)
+                        {
+                            return RedirectToPage("/Account/Login");
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "User Not Found");
+                    }
+                }
+            }
+            return RedirectToPage("Account/Users");
         }
 
         public void GetAllUsers() 
@@ -68,16 +150,6 @@ namespace UsersWebApp.Areas.Identity.Pages {
                     Status = U.Status
                 };
                 Users.Add(user);
-            }
-        }
-
-        public void GetCheckedUsers() {
-            foreach (var user in Users)
-            {
-                if (user.IsChecked) {
-                    CheckedUsers.Add(user);
-                }
-                CheckedUsers.Remove(user);
             }
         }
     }
